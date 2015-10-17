@@ -62,6 +62,9 @@ public class IRCClient {
     private String join(String channel){
         if(channellist.containsKey(channel))
             return "You are already joined the "+channel+" channel";
+        StringBuilder sb = new StringBuilder();
+        sb.append(nickname).append(" has joined the ").append(channel).append(" channel");
+        producer.send(new ProducerRecord<>(channel,sb.toString()));
         TopicConsumer topic = new TopicConsumer(channel, nickname);
         new Thread(topic).start();
         channellist.put(channel,topic);
@@ -72,6 +75,9 @@ public class IRCClient {
         if(!channellist.containsKey(channel))
             return "You are not in the "+channel+" channel";
         channellist.get(channel).shutdown();
+        StringBuilder sb = new StringBuilder();
+        sb.append(nickname).append(" has left the ").append(channel).append(" channel");
+        producer.send(new ProducerRecord<>(channel,sb.toString()));
         channellist.remove(channel);
         return "Successfully left the "+channel+" channel";
     }
