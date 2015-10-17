@@ -77,16 +77,19 @@ public class IRCClient {
     }
     
     private void send(String channel, String message){
-        StringBuilder sb;
+        StringBuilder sb = new StringBuilder();
+        if(!channel.equals(""))
+            sb.append("[").append(channel).append("]");
+        sb.append("[").append(nickname).append("]").append(" ").append(message);
         if(channel.equals("")){
             Iterator it = channellist.entrySet().iterator();
             while(it.hasNext()){
                 String dest = (String) ((Map.Entry)it.next()).getKey();
-                producer.send(new ProducerRecord<>(dest,message));
+                producer.send(new ProducerRecord<>(dest,sb.toString()));
             }
         }
         else{
-            producer.send(new ProducerRecord<>(channel,message));
+            producer.send(new ProducerRecord<>(channel,sb.toString()));
         }
     }
     
